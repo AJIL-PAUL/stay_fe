@@ -4,21 +4,24 @@ import { dopostBook, getHotelList } from "../../Redux/actions";
 import { navigate, useQueryParams, usePath } from "hookrouter";
 import * as Notficiation from "../../util/Notifications";
 import DatePicker from "react-date-picker";
+import { DEFAULT_IMAGE } from "../../Common/constants";
 
-export default function ViewRoom({ category, startdate, enddate }) {
-  console.log("category", category)
+export default function ViewRoom({ id, category, startdate, enddate }) {
+  const hotelid = id;
+  console.log("id", id);
+  console.log("category", category);
   const dispatch = useDispatch();
   const state = useSelector((state) => state);
   const { currentUser } = state;
   const [queryParams, setQueryParams] = useQueryParams();
-
+  const [avail, setavail] = useState(false);
   const [datein, setdatein] = useState({
     date: new Date(startdate),
   });
   const [dateout, setdateout] = useState({
     date: new Date(enddate),
   });
-
+  // const type = "room";
   const [detail, setDetail] = useState(false);
   // const [hdetail, sethDetail] = useState(false);
   useEffect(() => {
@@ -32,35 +35,35 @@ export default function ViewRoom({ category, startdate, enddate }) {
       .toISOString()
       .slice(0, -14);
     const form = {
+      hotelid: hotelid,
       category: category,
       checkin: checkin,
       checkout: checkout,
       type: "room",
-    }
-    dispatch(getHotelList(form)).then((res) => {
-      if (res) {
-        setDetail(res.data[0]);
-        setavail(true)
-      }
-      else {
-        setavail(false)
-      }
-
-    })
-      .catch(err => {
-        setavail(false)
+    };
+    dispatch(getHotelList(form))
+      .then((res) => {
+        if (res) {
+          setDetail(res.data[0]);
+          setavail(true);
+        } else {
+          setavail(false);
+        }
       })
+      .catch((err) => {
+        setavail(false);
+      });
   }, []);
-
-
 
   const onDateChange = (newdate) => {
     setdatein({ date: newdate });
+    setavail(false);
   };
   const onDateChange1 = (newdate1) => {
     setdateout({ date: newdate1 });
+    setavail(false);
   };
-  const [avail, setavail] = useState(true);
+  // const [avail, setavail] = useState(true);
   const currentURI = usePath();
 
   // booking button handle
@@ -78,7 +81,9 @@ export default function ViewRoom({ category, startdate, enddate }) {
       //logged in
 
       const body = {
-        roomid: detail.id,
+        // roomid: detail.id,
+        hotelid: hotelid,
+        category: category,
         checkin: checkin,
         checkout: checkout,
       };
@@ -91,22 +96,22 @@ export default function ViewRoom({ category, startdate, enddate }) {
             msg: "Booking Successfull",
           });
           navigate("/browse");
+        } else {
+          //not logged in
+          Notficiation.Error({
+            msg: "Please login to confirm your booking",
+          });
+
+          setQueryParams({ redirect: currentURI });
+          navigate(`/login?${queryParams}`);
+          //not logged in
         }
       });
-    } else {
-      //not logged in
-      Notficiation.Error({
-        msg: "Please login to confirm your booking",
-      });
-
-      setQueryParams({ redirect: currentURI })
-      navigate(`/login?${queryParams}`);
-      //not logged in
     }
   };
 
   const onDateApply = () => {
-    setavail(false)
+    setavail(false);
     var startdates = datein.date.getTimezoneOffset() * 60000; //offset in milliseconds
     var checkin = new Date(datein.date - startdates)
       .toISOString()
@@ -117,22 +122,21 @@ export default function ViewRoom({ category, startdate, enddate }) {
       .toISOString()
       .slice(0, -14);
     const formdata = {
+      hotelid: hotelid,
       category: category,
       checkin: checkin,
       checkout: checkout,
       type: "room",
-    }
-    dispatch(getHotelList(formdata))
-      .then(res => {
-        if (res) {
-          setDetail(res.data[0]);
-          setavail(true)
-        }
-        else {
-          setavail(false)
-        }
-      })
-  }
+    };
+    dispatch(getHotelList(formdata)).then((res) => {
+      if (res) {
+        setDetail(res.data[0]);
+        setavail(true);
+      } else {
+        setavail(false);
+      }
+    });
+  };
 
   console.log("date", datein.date);
   return (
@@ -141,9 +145,9 @@ export default function ViewRoom({ category, startdate, enddate }) {
         <div className="bg-white lg:mx-8 lg:my-4 lg:flex lg:max-w-5xl">
           <div className="lg:w-1/2">
             <img
-              className="h-64 bg-cover lg:rounded-lg "
-              src="https://images.unsplash.com/photo-1497493292307-31c376b6e479?ixlib=rb-1.2.1&auto=format&fit=crop&w=1351&q=80"
-              alt=""
+              className="h-64 bg-cover lg:rounded-lg"
+              src={DEFAULT_IMAGE.ROOM}
+              alt={detail.title}
             />
           </div>
           <div className="py-12 px-6 max-w-xl lg:max-w-5xl lg:w-1/2">
@@ -154,6 +158,7 @@ export default function ViewRoom({ category, startdate, enddate }) {
               <div className="relative">
                 <DatePicker
                   className="appearance-none block w-half bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-2 px-4"
+                  clearIcon={null}
                   format="yyyy-MM-dd"
                   value={datein.date}
                   onChange={(newdate) => onDateChange(newdate)}
@@ -167,6 +172,7 @@ export default function ViewRoom({ category, startdate, enddate }) {
               <div className="relative">
                 <DatePicker
                   className="appearance-none block w-half bg-grey-lighter text-grey-darker border border-grey-lighter rounded py-2 px-4"
+                  clearIcon={null}
                   format="yyyy-MM-dd"
                   value={dateout.date}
                   onChange={(newdateout) => onDateChange1(newdateout)}
@@ -186,11 +192,7 @@ export default function ViewRoom({ category, startdate, enddate }) {
                 disabled={!avail}
                 className="bg-gray-900 text-gray-100 px-8 py-3 font-semibold rounded float-right"
               >
-                {
-                  avail ?
-                    <div>Book Now</div> :
-                    <div>Not Available</div>
-                }
+                {avail ? <div>Book Now</div> : <div>Not Available</div>}
               </button>
             </div>
           </div>
