@@ -89,16 +89,15 @@ export default function ViewRoom() {
                     }
                     </div>
                   </div>
-                  <p className="text-gray-700 text-base">
-                    <ul>
-                      <li>Room Type : {value.category}</li>
-                      <li>Booking Date : {new Date(value.bookingDate).toLocaleString()}</li>
-                      <li>Checkin : {new Date(value.checkinDate).toLocaleString()}</li>
-                      <li>Checkout : {new Date(value.checkoutDate).toLocaleString()}</li>
-                      <li>Staus : {value.bookingStatus}</li>
-                      <li>Paid : Rs {value.cost}</li>
-                    </ul>
-                  </p>
+
+                  <ul className="text-gray-700 text-base">
+                    <li>Room Type : {value.category}</li>
+                    <li>Booking Date : {new Date(value.bookingDate).toLocaleString()}</li>
+                    <li>Checkin : {new Date(value.checkinDate).toLocaleString()}</li>
+                    <li>Checkout : {new Date(value.checkoutDate).toLocaleString()}</li>
+                    <li>Staus : {value.bookingStatus}</li>
+                    <li>Paid : Rs {value.cost}</li>
+                  </ul>
                 </div>
               </div>
             )
