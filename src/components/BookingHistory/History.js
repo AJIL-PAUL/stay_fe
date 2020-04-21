@@ -16,6 +16,7 @@ export default function ViewRoom() {
   const dispatch = useDispatch();
 
   const [form, setForm] = useState({});
+  const [form2, setForm2] = useState({});
 
   var i = 0;
 
@@ -30,24 +31,24 @@ export default function ViewRoom() {
           Notficiation.Success({
             msg: "Booking Cancelled"
           });
-          window.location.reload(false);
         }
       });
     }
+    setForm2();
   }
+
   useEffect(() => {
     dispatch(getBookingHistory()).then(resp => {
       const { data: res } = resp;
       setForm(res.data);
-      console.log(res.data);
     });
 
-  }, [dispatch, user]);
+  }, [dispatch, user, form2]);
   var count = form.length;
   for (i = 0; i < count; i++) {
     item = item.concat(form[count - 1 - i]);
-
   }
+
   if (count === 0) {
     return (
       <div className="py-10 bg-white min-h-full">
@@ -75,12 +76,12 @@ export default function ViewRoom() {
         <div className="relative  content-center  m-8 lg:mx-8 lg:my-4 lg:max-w-5xl">
           {item.map((value, index) => {
             return (
-              <div key={index} className="sm:w-full lg:w-1/2 md:w-3/4 bg-gray-300 mx-auto my-8  rounded overflow-hidden shadow-lg">
+              <div className="sm:w-full lg:w-1/2 md:w-3/4 bg-gray-300 mx-auto my-8  rounded overflow-hidden shadow-lg">
                 <img className="w-full  h-30" src={DEFAULT_IMAGE.HOTEL} alt={value.name} />
                 <div className="px-3 py-4">
                   <div className="font-bold flex text-xl mb-2">
                     <div className="w-1/2">{value.name}</div>
-                    <div className="m-0 m-auto">{
+                    <div class="m-0 m-auto">{
                       value.bookingStatus === "BOOKED" &&
                       <button onClick={Cancel} value={value.bookingStatus} name={value.bookingId} class="bg-white hover:bg-blue-500 text-blue-700 font-semibold mt-1  hover:text-white py-1 px-2 border border-blue-500 hover:border-transparent rounded">
                         Cancel
@@ -88,6 +89,7 @@ export default function ViewRoom() {
                     }
                     </div>
                   </div>
+
                   <ul className="text-gray-700 text-base">
                     <li>Room Type : {value.category}</li>
                     <li>Booking Date : {new Date(value.bookingDate).toLocaleString()}</li>
