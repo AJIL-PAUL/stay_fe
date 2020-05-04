@@ -129,7 +129,13 @@ function Hotel() {
 
     return (
         <div>
-            <div className="relative rounded-b-lg bg-white px-4 sm:px-6 lg:px-8 mx-auto">
+            <div
+                style={{
+                    background: "rgb(247,250,252)",
+                    background:
+                        "linear-gradient(180deg, rgba(247,250,252,1) 33%, rgba(241,245,249,1) 67%, rgba(239,243,247,1) 87%, rgba(239,243,247,1) 95%, rgba(237,242,247,1) 100%)",
+                }}
+                className="relative rounded-b-lg px-4 sm:px-6 lg:px-8 mx-auto">
                 <div className="relative max-w-7xl mx-auto">
                     <div className="">
                         {/* <h2 className="text-3xl leading-9 tracking-tight font-extrabold text-gray-900 sm:text-4xl sm:leading-10">
@@ -158,7 +164,10 @@ function Hotel() {
                                     onChange={handleChange}
                                     value={form.category}>
                                     {optionlist.category.map((item, index) => (
-                                        <option className="capitalize" key={index} value={item}>
+                                        <option
+                                            className="capitalize"
+                                            key={index}
+                                            value={item}>
                                             {item}
                                         </option>
                                     ))}
